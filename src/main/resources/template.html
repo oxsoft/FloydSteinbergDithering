@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>colors</title>
+    <style>
+        td {
+          width: 20px;
+          height: 20px;
+          padding: 0px;
+        }
+    </style>
+</head>
+<body>
+<table style="border-spacing:0px; width:WWWWWpx">
+    TTTTT
+</table>
+<div id="property" style="position:absolute; background-color:#ffffff; padding:5px; border:1px solid #000000">
+    <div id="position"></div>
+    <div id="plate"></div>
+    <div id="color"></div>
+</div>
+<script type="text/javascript">
+    const colors = CCCCC;
+    const property = document.getElementById("property");
+    const position = document.getElementById("position");
+    const plate = document.getElementById("plate");
+    const color = document.getElementById("color");
+    document.addEventListener("mousemove", function(e) {
+     let x = Math.floor((e.pageX-8)/20);
+     let y = Math.floor((e.pageY-8)/20);
+      property.style.left = e.pageX + 10 + "px";
+      property.style.top = e.pageY + 10 + "px";
+      position.textContent = " Position: (" + x%29 + "," + y%29 + ")";
+      plate.textContent = "Plate: (" + Math.floor(x/29) + "," + Math.floor(y/29) + ")";
+      color.textContent = "Color: " + colors[y][x];
+    });
+</script>
+</body>
+</html>

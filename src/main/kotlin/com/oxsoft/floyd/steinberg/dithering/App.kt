@@ -22,6 +22,7 @@ object App {
         val outputDirectory = args[0].substringBeforeLast(".")
         File(outputDirectory).mkdir()
         val colorList = javaClass.getResource("/color-list.tsv")?.readText() ?: return
+        val template = javaClass.getResource("/template.html")?.readText() ?: return
         val palette = colorList.split("\n").mapNotNull { row ->
             val cols = row.split("\t")
             if (cols.size < 5) return@mapNotNull null
@@ -86,6 +87,38 @@ object App {
         ImageIO.write(outputImage, "png", File("$outputDirectory/0_output.png"))
         println("誤差拡散処理が完了しました。")
 
+        val table = buildString {
+            for (y in 0 until height) {
+                append("<tr>")
+                for (x in 0 until width) {
+                    val color = beads[y][x].color
+                    append("<td style=\"background-color:")
+                    append(String.format("#%02x%02x%02x", color.red, color.green, color.blue))
+                    append("\"></td>")
+                }
+                append("</tr>")
+            }
+        }
+        val colors = buildString {
+            append("[")
+            for (y in 0 until height) {
+                append("[")
+                for (x in 0 until width) {
+                    append("\"")
+                    append(beads[y][x].name)
+                    append("\",")
+                }
+                append("],")
+            }
+            append("]")
+        }
+        File("$outputDirectory/0_output.html").writeText(
+            template
+                .replace("WWWWW", (width * 20).toString())
+                .replace("TTTTT", table)
+                .replace("CCCCC", colors)
+        )
+
         val types = beads.flatMap { it.toSet() }.toSet()
         types.forEach { type ->
             val outputImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
@@ -93,8 +126,19 @@ object App {
                 for (x in 0 until width) {
                     val color = when {
                         type == beads[y][x] -> Color.black
-                        (x / 5 + y / 5) % 2 == 0 -> Color.white
-                        else -> Color.lightGray
+                        (x / 5 + y / 5) % 2 == 0 -> {
+                            when {
+                                (x / 29 + y / 29) % 2 == 0 -> Color.white
+                                else -> Color(255, 255, 192)
+                            }
+                        }
+
+                        else -> {
+                            when {
+                                (x / 29 + y / 29) % 2 == 0 -> Color.lightGray
+                                else -> Color(192, 255, 255)
+                            }
+                        }
                     }
                     outputImage.setRGB(x, y, color.rgb)
                 }
